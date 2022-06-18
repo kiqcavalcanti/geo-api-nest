@@ -1,0 +1,33 @@
+  version: '3'
+  networks:
+    geo-api:
+
+  services:
+    postgres_geo-api-nest:
+      image: postgres:14.2-alpine
+      container_name: postgres_geo-api-nest
+      restart: unless-stopped
+      tty: true
+      ports:
+        - "${POSTGRES_PORT}:5432"
+      volumes:
+        - ./postgres/data:/var/lib/postgresql/data
+        - ./postgres/extensions.sql:/docker-entrypoint-initdb.d/extensions.sql
+      environment:
+        - POSTGRES_DB=${POSTGRES_DB}
+        - POSTGRES_USER=${POSTGRES_USER}
+        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      networks:
+        - geo-api
+
+    node_geo-api-nest:
+      build:
+        context: .
+        dockerfile: Dockerfile
+      container_name: node_geo-api-nest
+      volumes:
+        - ${PWD}:/app/geo-api
+      ports:
+        - "${APP_PORT}:3000"
+      networks:
+        - geo-api
