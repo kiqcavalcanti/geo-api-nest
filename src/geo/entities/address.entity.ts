@@ -1,11 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('addresses')
 export class Address {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'postal_code' })
+  @Index()
+  @Column({ name: 'postal_code', length: 8 })
   postalCode: string;
 
   @Column()
