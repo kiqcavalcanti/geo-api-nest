@@ -3,11 +3,10 @@ import {
   Controller,
   Get,
   HttpException,
-  NotFoundException,
   Query,
 } from '@nestjs/common';
+
 import { GeoService } from '../services/geo.service';
-import { query } from 'express';
 
 @Controller('geo')
 export class GeoController {
@@ -25,7 +24,11 @@ export class GeoController {
       throw new HttpException('postalCode must have 8 numbers', 400);
     }
 
-    return this.geoService.search(postalCode);
+    try {
+      return this.geoService.search(postalCode);
+    } catch (e) {
+      throw new HttpException('address not found', 422);
+    }
   }
   @Get('get-distance-by-postalcodes')
   async getDistanceByPostalCodes(

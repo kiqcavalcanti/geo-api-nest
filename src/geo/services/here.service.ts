@@ -1,6 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import axios from 'axios';
-import { NotFoundError } from 'rxjs';
 
 type Address = {
   address: {
@@ -61,7 +60,7 @@ export class HereService {
 
       return hereData;
     } catch ($e) {
-      throw new NotFoundError('Address not found');
+      throw new HttpException('Address not found', 400);
     }
   }
 }
