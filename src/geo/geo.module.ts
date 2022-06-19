@@ -6,9 +6,10 @@ import { Address } from './entities/address.entity';
 import { ViaCepService } from './services/via-cep.service';
 import { HereService } from './services/here.service';
 import { RouterApiService } from './services/router-api.service';
+import { Distance } from './entities/distance.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Address])],
+  imports: [TypeOrmModule.forFeature([Address, Distance])],
   controllers: [GeoController],
   providers: [GeoService, ViaCepService, HereService, RouterApiService],
 })

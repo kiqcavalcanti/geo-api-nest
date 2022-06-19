@@ -5,6 +5,7 @@ import { Address } from '../entities/address.entity';
 import { ViaCepService } from './via-cep.service';
 import { HereService } from './here.service';
 import { RouterApiService } from './router-api.service';
+import { Distance } from '../entities/distance.entity';
 
 @Injectable()
 export class GeoService {
@@ -14,6 +15,8 @@ export class GeoService {
     protected readonly routeApiService: RouterApiService,
     @InjectRepository(Address)
     protected readonly addressRepository: Repository<Address>,
+    @InjectRepository(Distance)
+    protected readonly distanceRepository: Repository<Distance>,
   ) {}
 
   async search(postalCode: string) {
@@ -39,10 +42,15 @@ export class GeoService {
       postalCode: postalCode,
     });
 
-    return this.addressRepository.save(address);
+    address = await this.addressRepository.save(address);
+
+    return { ...address, id: undefined };
   }
 
-  async getDistance(firstPostalCode: string, secondPostalCode: string) {
+  async getDistanceByPostalCodes(
+    firstPostalCode: string,
+    secondPostalCode: string,
+  ) {
     const findAddresses = await Promise.all([
       this.addressRepository.findOneBy({
         postalCode: firstPostalCode,
@@ -99,13 +107,36 @@ export class GeoService {
     longitude2: number,
     latitude2: number,
   ) {
+    const hash = Buffer.from(
+      longitude1 + ',' + latitude1 + ',' + longitude2 + ',' + latitude2,
+    ).toString('base64');
+
+    const distanceData = await this.distanceRepository.findOneBy({
+      coordinatesHash: hash,
+    });
+
+    if (distanceData) {
+      return {
+        distance: distanceData.distance,
+      };
+    }
+
+    const distanceInKm = await this.routeApiService.getDistance(
+      longitude1,
+      latitude1,
+      longitude2,
+      latitude2,
+    );
+
+    const distance = this.distanceRepository.create({
+      coordinatesHash: hash,
+      distance: distanceInKm,
+    });
+
+    await this.distanceRepository.save(distance);
+
     return {
-      distance: await this.routeApiService.getDistance(
-        longitude1,
-        latitude1,
-        longitude2,
-        latitude2,
-      ),
+      distance: distanceInKm,
     };
   }
 }

@@ -48,12 +48,42 @@ export class GeoController {
     }
 
     try {
-      return await this.geoService.getDistance(
+      return await this.geoService.getDistanceByPostalCodes(
         firstPostalCode,
         secondPostalCode,
       );
     } catch (e) {
       throw new BadRequestException('Distance could not be calculated');
     }
+  }
+  @Get('get-distance-by-coordinates')
+  async getDistanceByCoordinates(
+    @Query('latitude1') latitude1: number,
+    @Query('longitude1') longitude1: number,
+    @Query('latitude2') latitude2: number,
+    @Query('longitude2') longitude2: number,
+  ) {
+    if (!latitude1) {
+      throw new HttpException('latitude1 is required', 400);
+    }
+
+    if (!latitude2) {
+      throw new HttpException('latitude2 is required', 400);
+    }
+
+    if (!longitude1) {
+      throw new HttpException('longitude1 is required', 400);
+    }
+
+    if (!longitude2) {
+      throw new HttpException('longitude2 is required', 400);
+    }
+
+    return this.geoService.getDistanceRoute(
+      longitude1,
+      latitude1,
+      longitude2,
+      latitude2,
+    );
   }
 }
