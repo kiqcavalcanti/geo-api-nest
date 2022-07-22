@@ -21,6 +21,7 @@
         - geo-api
 
     node_geo-api-nest:
+      entrypoint: ./nest-entrypoint.sh
       build:
         context: .
         dockerfile: Dockerfile

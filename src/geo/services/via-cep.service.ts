@@ -1,6 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import {Injectable, NotFoundException} from '@nestjs/common';
 import axios from 'axios';
-import { NotFoundError } from 'rxjs';
 
 type AddressData = {
   state: string;
@@ -26,11 +25,11 @@ export class ViaCepService {
     );
 
     if (!data) {
-      throw new NotFoundError('Address not found');
+      throw new NotFoundException('Address not found');
     }
 
     if (status < 200 && status > 299) {
-      throw new NotFoundError('Address not found');
+      throw new NotFoundException('Address not found');
     }
 
     const addressData: AddressData = {

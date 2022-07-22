@@ -1,5 +1,7 @@
 FROM node:alpine
 
-WORKDIR /app/geo-api
+RUN apk add --no-cache bash
 
-CMD [ "yarn", "start:dev" ]
+RUN npm install -g @nestjs/cli
+
+WORKDIR /app/geo-api
